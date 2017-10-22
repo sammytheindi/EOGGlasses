@@ -2,11 +2,12 @@ int inp_1 = A0;
 int inp_2 = A1;
 int LED_1 = A4;
 int LED_2 = A5;
-float threshV = 3.0;
-float threshH = 3.0;
+float threshV = 2.0;
+float threshH = 2.0;
 int V_Ch = 0.0;
 int H_Ch = 0.0;
 int ref_Period = 1000;
+float cent = (1025.0/5.0)*2.5;
 
 #include <SoftwareSerial.h>
 SoftwareSerial XBee(2, 3); // TX, RX
@@ -38,17 +39,26 @@ void loop() {
     analogRead(A4);
     H_Ch = analogRead(inp_2);
     
-    if (V_Ch > (int)((1025.0/5.0)*threshV)) {
-      XBee.write('H');
+    if (V_Ch > (int)(cent + (1025.0/5.0)*threshV)) {
+      XBee.write('H1');
+      Serial.println('SendH');
+      delay(ref_Period);
+    } else if (V_Ch < (int)(cent - (1025.0/5.0)*threshV)) {
+      XBee.write('H2');
       Serial.println('SendH');
       delay(ref_Period);
     }
 
-    if (H_Ch > (int)((1025.0/5.0)*threshH)) {
-      XBee.write('J');
+    if (H_Ch > (int)(cent + (1025.0/5.0)*threshH)) {
+      XBee.write('J1');
+      Serial.println('SendJ');
+      delay(ref_Period);
+    } else if (H_Ch < (int)(cent - (1025.0/5.0)*threshH)) {
+      XBee.write('J2');
       Serial.println('SendJ');
       delay(ref_Period);
     }
+    
   }
 }
 
